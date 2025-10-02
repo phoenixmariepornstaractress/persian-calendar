@@ -11,6 +11,9 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
@@ -33,6 +36,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -329,8 +333,14 @@ private fun HelpItems() {
             var isExpanded by rememberSaveable { mutableStateOf(false) }
             Column(
                 modifier = Modifier
-                    .clickable { isExpanded = !isExpanded }
-                    .padding(all = 4.dp)
+                    .toggleable(isExpanded) { isExpanded = it }
+                    .padding(
+                        horizontal = 4.dp,
+                        vertical = animateDpAsState(
+                            if (isExpanded) 6.dp else 4.dp,
+                            animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+                        ).value
+                    )
                     .fillMaxWidth()
                     .animateContentSize(),
             ) {
@@ -346,9 +356,7 @@ private fun HelpItems() {
                     Text(title, modifier = Modifier.align(alignment = Alignment.CenterVertically))
                 }
                 this.AnimatedVisibility(visible = isExpanded) {
-                    SelectionContainer {
-                        Text(body, Modifier.padding(horizontal = 16.dp))
-                    }
+                    SelectionContainer { Text(body, Modifier.padding(horizontal = 16.dp)) }
                 }
             }
         }

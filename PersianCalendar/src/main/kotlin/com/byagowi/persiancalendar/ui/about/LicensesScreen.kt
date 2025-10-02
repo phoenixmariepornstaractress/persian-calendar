@@ -9,9 +9,9 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
@@ -163,14 +164,18 @@ private fun BoxScope.Licenses(bottomPadding: Dp) {
                 modifier = Modifier.padding(start = 16.dp, end = 88.dp),
                 color = MaterialTheme.colorScheme.outline.copy(alpha = .5f),
             )
+            val verticalPadding by animateDpAsState(
+                if (expandedItem == i) 6.dp else 4.dp,
+                animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+            )
             Column(
                 modifier = Modifier
-                    .clickable { expandedItem = if (i == expandedItem) -1 else i }
+                    .toggleable(i == expandedItem) { expandedItem = if (it) i else -1 }
                     .padding(
                         start = 16.dp,
                         end = 88.dp,
-                        top = if (i == 0) 16.dp else 4.dp,
-                        bottom = 4.dp,
+                        top = verticalPadding + if (i == 0) 12.dp else 0.dp,
+                        bottom = verticalPadding,
                     )
                     .fillMaxWidth()
                     .animateContentSize(
